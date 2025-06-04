@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erjean.carbatterywarning.mapper.BatterySignalMapper">
+
+    <resultMap id="BaseResultMap" type="com.erjean.carbatterywarning.model.entity.BatterySignal">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="vid" column="vid" jdbcType="VARCHAR"/>
+            <result property="frameNumber" column="frame_number" jdbcType="BIGINT"/>
+            <result property="batteryType" column="battery_type" jdbcType="TINYINT"/>
+            <result property="signalData" column="signal_data" jdbcType="OTHER"/>
+            <result property="reportTime" column="report_time" jdbcType="TIMESTAMP"/>
+            <result property="processed" column="processed" jdbcType="TINYINT"/>
+            <result property="processedTime" column="processed_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,vid,frame_number,
+        battery_type,signal_data,report_time,
+        processed,processed_time
+    </sql>
+</mapper>

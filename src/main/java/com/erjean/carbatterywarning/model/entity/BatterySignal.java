@@ -1,0 +1,26 @@
+package com.erjean.carbatterywarning.model.entity;
+
+import java.util.Date;
+import lombok.Data;
+
+/**
+ * @TableName battery_signal
+ */
+@Data
+public class BatterySignal {
+    private Long id;
+
+    private String vid;
+
+    private Long frameNumber;
+
+    private Integer batteryType;
+
+    private Object signalData;
+
+    private Date reportTime;
+
+    private Integer processed;
+
+    private Date processedTime;
+}

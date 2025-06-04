@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.erjean.carbatterywarning.mapper.VehicleInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.erjean.carbatterywarning.model.entity.VehicleInfo">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="vid" column="vid" jdbcType="VARCHAR"/>
+            <result property="frameNumber" column="frame_number" jdbcType="BIGINT"/>
+            <result property="batteryType" column="battery_type" jdbcType="TINYINT"/>
+            <result property="totalMileage" column="total_mileage" jdbcType="INTEGER"/>
+            <result property="batteryHealth" column="battery_health" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,vid,frame_number,
+        battery_type,total_mileage,battery_health
+    </sql>
+</mapper>
