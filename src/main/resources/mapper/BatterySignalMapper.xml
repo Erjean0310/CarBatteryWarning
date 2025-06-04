@@ -27,13 +27,28 @@
                                     battery_type,
                                     `signal`,
                                     report_time,
-                                    processed,
-                                    processed_time)
+                                    processed)
         VALUES (#{vid},
                 #{carId},
                 #{batteryType},
                 #{signal},
                 #{reportTime},
-                #{processed},
-                #{processedTime})</insert>
+                #{processed})</insert>
+
+    <select id="selectByVid" resultMap="BaseResultMap">
+        SELECT
+        id,
+        vid,
+        car_id,
+        battery_type,
+        `signal`,
+        report_time,
+        processed,
+        processed_time
+        FROM battery_signal
+        <where>
+            vid = #{vid}
+        </where>
+    </select>
+
 </mapper>

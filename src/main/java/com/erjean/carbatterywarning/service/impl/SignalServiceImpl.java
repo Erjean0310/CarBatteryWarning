@@ -15,6 +15,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 
@@ -45,6 +47,8 @@ public class SignalServiceImpl implements SignalService {
         batterySignal.setId(id);
         // 初始为未处理状态
         batterySignal.setProcessed(0);
+        // 设置上报时间
+        batterySignal.setReportTime(new Date());
         // 将信号转换为字符串
         try {
             batterySignal.setSignal(objectMapper.writeValueAsString(request.getSignal()));
@@ -59,8 +63,9 @@ public class SignalServiceImpl implements SignalService {
     }
 
     @Override
-    public BatterySignal getSignalByVid(String vid) {
-        return null;
+    public List<BatterySignal> listSignalsByVid(String vid) {
+        List<BatterySignal> batterySignalList = batterySignalMapper.selectByVid(vid);
+        return batterySignalList;
     }
 
     @Override

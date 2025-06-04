@@ -34,8 +34,8 @@ public class SignalController {
 
 
     @GetMapping("/signal/{vid}")
-    public BaseResponse<BatterySignal> getSignal(@PathVariable String vid) {
-        BatterySignal batterySignal = signalService.getSignalByVid(vid);
+    public BaseResponse<List<BatterySignal>> listSignalsByVid(@PathVariable String vid) {
+        List<BatterySignal> batterySignal = signalService.listSignalsByVid(vid);
         return ResultUtil.success(batterySignal);
     }
 

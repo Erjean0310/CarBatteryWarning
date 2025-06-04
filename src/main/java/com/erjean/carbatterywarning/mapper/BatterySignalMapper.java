@@ -2,6 +2,8 @@ package com.erjean.carbatterywarning.mapper;
 
 import com.erjean.carbatterywarning.model.entity.BatterySignal;
 
+import java.util.List;
+
 public interface BatterySignalMapper {
     /**
      * 插入电池信号到数据库
@@ -9,6 +11,8 @@ public interface BatterySignalMapper {
      * @return 插入的行数
      */
     int insert(BatterySignal batterySignal);
+
+    List<BatterySignal> selectByVid(String vid);
 }
 
 

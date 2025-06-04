@@ -17,7 +17,7 @@ public interface SignalService {
      */
     Long report(SignalReportRequest request);
 
-    BatterySignal getSignalByVid(String vid);
+    public List<BatterySignal> listSignalsByVid(String vid);
 
     void warn(List<WarningReportRequest> requests);
 }
