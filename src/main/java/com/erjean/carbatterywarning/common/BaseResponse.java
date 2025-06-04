@@ -1,10 +1,13 @@
 package com.erjean.carbatterywarning.common;
 
+import lombok.Data;
+
 import java.io.Serializable;
 
 /**
  * 通用返回类
  */
+@Data
 public class BaseResponse<T> implements Serializable {
     private int code;
     private String msg;

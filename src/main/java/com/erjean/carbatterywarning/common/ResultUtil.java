@@ -1,7 +1,4 @@
-package com.erjean.huierma.common;
-
-import com.erjean.carbatterywarning.common.BaseResponse;
-import com.erjean.carbatterywarning.common.ErrorCode;
+package com.erjean.carbatterywarning.common;
 
 /**
  * 返回结果 工具类

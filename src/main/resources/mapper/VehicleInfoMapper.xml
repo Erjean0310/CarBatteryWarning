@@ -7,7 +7,7 @@
     <resultMap id="BaseResultMap" type="com.erjean.carbatterywarning.model.entity.VehicleInfo">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="vid" column="vid" jdbcType="VARCHAR"/>
-            <result property="frameNumber" column="frame_number" jdbcType="BIGINT"/>
+            <result property="cardId" column="card_id" jdbcType="BIGINT"/>
             <result property="batteryType" column="battery_type" jdbcType="TINYINT"/>
             <result property="totalMileage" column="total_mileage" jdbcType="INTEGER"/>
             <result property="batteryHealth" column="battery_health" jdbcType="TINYINT"/>

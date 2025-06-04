@@ -12,11 +12,11 @@ public class BatterySignal {
 
     private String vid;
 
-    private Long frameNumber;
+    private Long carId;
 
     private Integer batteryType;
 
-    private Object signalData;
+    private Object signal;
 
     private Date reportTime;
 

@@ -11,7 +11,7 @@ public class VehicleInfo {
 
     private String vid;
 
-    private Long frameNumber;
+    private Long cardId;
 
     private Integer batteryType;
 

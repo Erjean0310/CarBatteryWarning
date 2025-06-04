@@ -3,17 +3,17 @@ package com.erjean.carbatterywarning.model.entity;
 import lombok.Data;
 
 /**
- * @TableName rule
+ * @TableName warn_rule
  */
 @Data
-public class Rule {
+public class WarnRule {
     private Integer id;
 
-    private Integer ruleId;
+    private Integer warnId;
 
     private String ruleName;
 
     private Integer batteryType;
 
-    private Object warningRule;
+    private Object rule;
 }
