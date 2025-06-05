@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 spring:
   application:
     name: day01
@@ -14,5 +14,15 @@ mybatis:
 snowflake:
   data-center-id: 1
   worker-id: 1
+
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: warn-pg
+  consumer:
+    topic: warn-topic
+    group: warn-cg
+
+
 
 

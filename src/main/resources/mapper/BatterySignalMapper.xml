@@ -8,7 +8,7 @@
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="vid" column="vid" jdbcType="VARCHAR"/>
         <result property="carId" column="car_id" jdbcType="BIGINT"/>
-        <result property="batteryTypeEnum" column="battery_type" jdbcType="TINYINT"/>
+        <result property="batteryType" column="battery_type" jdbcType="TINYINT"/>
         <result property="signal" column="signal" jdbcType="OTHER"/>
         <result property="reportTime" column="report_time" jdbcType="TIMESTAMP"/>
         <result property="processed" column="processed" jdbcType="TINYINT"/>
@@ -30,10 +30,18 @@
                                     processed)
         VALUES (#{vid},
                 #{carId},
-                #{batteryTypeEnum},
+                #{batteryType},
                 #{signal},
                 #{reportTime},
                 #{processed})</insert>
+
+    <update id="updateProcessState">
+        UPDATE battery_signal
+        SET processed      = 1,
+            processed_time = #{processedTime}
+        WHERE id = #{id}
+          and processed = 0
+    </update>
 
     <select id="selectByVid" resultMap="BaseResultMap">
         SELECT
@@ -50,5 +58,19 @@
             vid = #{vid}
         </where>
     </select>
+    <select id="selectSignalsByDate" resultMap="BaseResultMap">
+        SELECT id,
+               vid,
+               car_id,
+               battery_type,
+               `signal`,
+               report_time,
+               processed,
+               processed_time
+        FROM battery_signal
+        WHERE report_time >= #{date}
+          AND processed = 0
+    </select>
+
 
 </mapper>

@@ -1,7 +1,9 @@
 package com.erjean.carbatterywarning.mapper;
 
 import com.erjean.carbatterywarning.model.entity.BatterySignal;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface BatterySignalMapper {
@@ -13,6 +15,11 @@ public interface BatterySignalMapper {
     int insert(BatterySignal batterySignal);
 
     List<BatterySignal> selectByVid(String vid);
+
+    List<BatterySignal> selectSignalsByDate(Date date);
+
+    int updateProcessState(@Param("id") Long id, @Param("processedTime") Date processedTime);
+
 }
 
 

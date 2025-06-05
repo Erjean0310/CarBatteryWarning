@@ -1,5 +1,6 @@
 package com.erjean.carbatterywarning.model.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
@@ -7,7 +8,7 @@ import lombok.Data;
  * @TableName battery_signal
  */
 @Data
-public class BatterySignal {
+public class BatterySignal implements Serializable {
     private Long id;
 
     private String vid;
@@ -23,4 +24,6 @@ public class BatterySignal {
     private Integer processed;
 
     private Date processedTime;
+
+    private static final long serialVersionUID = 1L;
 }

@@ -23,4 +23,10 @@ public class JacksonConfig {
     public SignalDeserializer signalDeserializer() {
         return new SignalDeserializer();
     }
+
+
+    @Bean
+    public ObjectMapper cleanObjectMapper() {
+        return new ObjectMapper();
+    }
 }
