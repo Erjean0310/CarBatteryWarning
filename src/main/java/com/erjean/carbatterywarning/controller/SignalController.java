@@ -5,6 +5,7 @@ import com.erjean.carbatterywarning.common.ResultUtil;
 import com.erjean.carbatterywarning.model.dto.SignalReportRequest;
 import com.erjean.carbatterywarning.model.dto.WarningReportRequest;
 import com.erjean.carbatterywarning.model.entity.BatterySignal;
+import com.erjean.carbatterywarning.model.vo.WarnResult;
 import com.erjean.carbatterywarning.service.SignalService;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,9 +41,8 @@ public class SignalController {
     }
 
     @PostMapping("/warn")
-    public BaseResponse warn(@RequestBody List<WarningReportRequest> requests) {
-        System.out.println(requests);
-        signalService.warn(requests);
-        return ResultUtil.success(null);
+    public BaseResponse<List<WarnResult>> warn(@RequestBody List<WarningReportRequest> requests) {
+        List<WarnResult> results = signalService.warn(requests);
+        return ResultUtil.success(results);
     }
 }

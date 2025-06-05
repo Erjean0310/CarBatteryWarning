@@ -1,4 +1,4 @@
-package com.erjean.carbatterywarning.model.entity;
+package com.erjean.carbatterywarning.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

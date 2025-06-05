@@ -8,7 +8,7 @@
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="vid" column="vid" jdbcType="VARCHAR"/>
         <result property="carId" column="car_id" jdbcType="BIGINT"/>
-        <result property="batteryType" column="battery_type" jdbcType="TINYINT"/>
+        <result property="batteryTypeEnum" column="battery_type" jdbcType="TINYINT"/>
         <result property="signal" column="signal" jdbcType="OTHER"/>
         <result property="reportTime" column="report_time" jdbcType="TIMESTAMP"/>
         <result property="processed" column="processed" jdbcType="TINYINT"/>
@@ -30,7 +30,7 @@
                                     processed)
         VALUES (#{vid},
                 #{carId},
-                #{batteryType},
+                #{batteryTypeEnum},
                 #{signal},
                 #{reportTime},
                 #{processed})</insert>

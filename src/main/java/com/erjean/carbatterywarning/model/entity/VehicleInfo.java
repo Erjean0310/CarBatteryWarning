@@ -11,7 +11,7 @@ public class VehicleInfo {
 
     private String vid;
 
-    private Long cardId;
+    private Long carId;
 
     private Integer batteryType;
 

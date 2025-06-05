@@ -1,10 +1,8 @@
 package com.erjean.carbatterywarning.mapper;
 
-import org.apache.ibatis.annotations.Mapper;
-
-//@Mapper
 public interface VehicleInfoMapper {
 
+    Integer getBatteryTypeByCarId(Long carId);
 }
 
 

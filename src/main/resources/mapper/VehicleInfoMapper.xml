@@ -7,8 +7,8 @@
     <resultMap id="BaseResultMap" type="com.erjean.carbatterywarning.model.entity.VehicleInfo">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="vid" column="vid" jdbcType="VARCHAR"/>
-            <result property="cardId" column="card_id" jdbcType="BIGINT"/>
-            <result property="batteryType" column="battery_type" jdbcType="TINYINT"/>
+            <result property="carId" column="car_id" jdbcType="BIGINT"/>
+            <result property="batteryTypeEnum" column="battery_type" jdbcType="TINYINT"/>
             <result property="totalMileage" column="total_mileage" jdbcType="INTEGER"/>
             <result property="batteryHealth" column="battery_health" jdbcType="TINYINT"/>
     </resultMap>
@@ -17,4 +17,9 @@
         id,vid,frame_number,
         battery_type,total_mileage,battery_health
     </sql>
+    <select id="getBatteryTypeByCarId" resultType="java.lang.Integer">
+        select battery_type
+        from vehicle_info
+        where car_id = #{carId}
+    </select>
 </mapper>

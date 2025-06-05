@@ -1,7 +1,7 @@
 package com.erjean.carbatterywarning.model.dto;
 
 
-import com.erjean.carbatterywarning.model.entity.Signal;
+import com.erjean.carbatterywarning.model.domain.Signal;
 import lombok.Data;
 
 @Data
