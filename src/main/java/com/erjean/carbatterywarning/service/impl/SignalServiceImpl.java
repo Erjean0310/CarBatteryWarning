@@ -3,19 +3,21 @@ package com.erjean.carbatterywarning.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.generator.SnowflakeGenerator;
 import com.erjean.carbatterywarning.common.ErrorCode;
+import com.erjean.carbatterywarning.constant.RedisConstants;
 import com.erjean.carbatterywarning.exception.BusinessException;
 import com.erjean.carbatterywarning.exception.ThrowUtil;
 import com.erjean.carbatterywarning.loader.WarnDataLoader;
 import com.erjean.carbatterywarning.mapper.BatterySignalMapper;
 import com.erjean.carbatterywarning.mapper.VehicleInfoMapper;
+import com.erjean.carbatterywarning.model.domain.Rule;
+import com.erjean.carbatterywarning.model.domain.WarnRuleData;
 import com.erjean.carbatterywarning.model.dto.SignalReportRequest;
 import com.erjean.carbatterywarning.model.dto.WarningReportRequest;
 import com.erjean.carbatterywarning.model.entity.BatterySignal;
-import com.erjean.carbatterywarning.model.domain.Rule;
-import com.erjean.carbatterywarning.model.domain.WarnRuleData;
 import com.erjean.carbatterywarning.model.enums.BatteryTypeEnum;
 import com.erjean.carbatterywarning.model.vo.WarnResult;
 import com.erjean.carbatterywarning.service.SignalService;
+import com.erjean.carbatterywarning.utils.RedisUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
@@ -39,6 +41,8 @@ public class SignalServiceImpl implements SignalService {
     private VehicleInfoMapper vehicleInfoMapper;
     @Resource
     private WarnDataLoader warnDataLoader;
+    @Resource
+    private RedisUtils redisUtils;
 
     /**
      * 上报电池信息
@@ -66,6 +70,10 @@ public class SignalServiceImpl implements SignalService {
         // 保存到数据库
         int result = batterySignalMapper.insert(batterySignal);
         ThrowUtil.throwIf(result != 1, ErrorCode.OPERATION_ERROR, "保存信号的数据库出错");
+
+        // 缓存数据
+        redisUtils.hashPut(RedisConstants.BATTERY_SIGNAL_KEY + batterySignal.getVid(), String.valueOf(id), batterySignal);
+
         // 返回 id
         return id;
     }
@@ -78,7 +86,25 @@ public class SignalServiceImpl implements SignalService {
      */
     @Override
     public List<BatterySignal> listSignalsByVid(String vid) {
-        List<BatterySignal> batterySignalList = batterySignalMapper.selectByVid(vid);
+        // 查询缓存
+        List<Object> batterSignalObjects = redisUtils.hashValues(RedisConstants.BATTERY_SIGNAL_KEY + vid);
+        List<BatterySignal> batterySignalList;
+        if (batterSignalObjects != null && !batterSignalObjects.isEmpty()) {
+            batterySignalList = new ArrayList<>();
+            for (Object batterSignalObject : batterSignalObjects) {
+                BatterySignal batterySignal = (BatterySignal) batterSignalObject;
+                batterySignalList.add(batterySignal);
+            }
+            return batterySignalList;
+        } else {
+            // 缓存未命中则查询数据库
+            batterySignalList = batterySignalMapper.selectByVid(vid);
+
+            // 添加到缓存
+            for (BatterySignal batterySignal : batterySignalList) {
+                redisUtils.hashPut(RedisConstants.BATTERY_SIGNAL_KEY + vid, batterySignal.getId(), batterySignal);
+            }
+        }
         return batterySignalList;
     }
 

@@ -5,7 +5,9 @@ import com.erjean.carbatterywarning.model.entity.BatterySignal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -58,5 +60,13 @@ class CarBatteryWarningApplicationTests {
     @Test
     void mqTest2() {
         rocketMQTemplate.convertAndSend("test052801", "你好0605");
+    }
+
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+    @Test
+    void redisTest() {
+        redisTemplate.opsForValue().set("test", "hello world");
     }
 }
