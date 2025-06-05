@@ -59,6 +59,7 @@ public class MqComponent {
                 List<Message> subList = splitter.next();
                 // 使用生产者发送批量消息
                 producer.send(subList);
+                System.out.println("发送消息数量"+subList.size());
                 System.out.println("Sent batch messages to topic: " + topic);
             } catch (Exception e) {
                 System.err.println("Failed to send batch messages: " + e.getMessage());

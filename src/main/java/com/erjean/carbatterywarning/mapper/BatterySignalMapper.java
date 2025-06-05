@@ -24,6 +24,9 @@ public interface BatterySignalMapper {
     BatterySignal selectLatestSignalByVid(String vid);
 
     List<BatterySignal> selectByIds(@Param("ids") List<Long> ids);
+
+    void batchUpdateProcessState(@Param("ids") List<Long> ids, @Param("processTime") Date processTime);
+
 }
 
 

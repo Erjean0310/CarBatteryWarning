@@ -18,9 +18,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Configuration
@@ -49,9 +48,11 @@ public class WarnConsumer {
         consumer.setConsumeThreadMin(10);  // 最小线程数
         consumer.setConsumeThreadMax(30);  // 最大线程数
         consumer.setPullBatchSize(64);     // 每次从 Broker 拉取最多 64 条消息
-        consumer.setConsumeMessageBatchMaxSize(1); // 每次提交处理的消息数量（单条处理）
+        consumer.setConsumeMessageBatchMaxSize(64); // 每次提交处理的消息数量（单条处理）
 
         consumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {
+            List<BatterySignal> batchList = new ArrayList<>();
+
             for (MessageExt msg : msgs) {
                 try {
                     String json = new String(msg.getBody(), StandardCharsets.UTF_8);
@@ -106,14 +107,30 @@ public class WarnConsumer {
                         }
                     }
 
-                    // 更新数据库
-                    batterySignalMapper.updateProcessState(id, new Date());
+                    // 缓存当前消息用于后续批量操作
+                    batchList.add(batterySignal);
 
                 } catch (Exception e) {
                     log.error("消费消息失败", e);
                     return ConsumeConcurrentlyStatus.RECONSUME_LATER;
                 }
             }
+
+            // 批量更新数据库
+            if (!batchList.isEmpty()) {
+                List<Long> ids = batchList.stream()
+                        .map(BatterySignal::getId)
+                        .collect(Collectors.toList());
+
+                try {
+                    batterySignalMapper.batchUpdateProcessState(ids, new Date());
+                    log.info("批量更新 {} 条记录", ids.size());
+                } catch (Exception e) {
+                    log.error("批量更新失败", e);
+                    return ConsumeConcurrentlyStatus.RECONSUME_LATER;
+                }
+            }
+
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         });
 

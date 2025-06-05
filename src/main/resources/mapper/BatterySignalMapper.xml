@@ -45,6 +45,16 @@
           and processed = 0
     </update>
 
+    <update id="batchUpdateProcessState">
+        UPDATE battery_signal
+        SET processed = 1, processed_time = #{processTime}
+        WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+
     <select id="selectByVid" resultMap="BaseResultMap">
         SELECT
         id,
