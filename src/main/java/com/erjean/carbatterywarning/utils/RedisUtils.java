@@ -33,10 +33,10 @@ public class RedisUtils {
     /**
      * 根据key删除缓缓存
      *
-     * @param keys 键
+     * @param key 键
      */
-    public <K> void delete(Collection<K> keys) {
-        redisTemplate.delete(keys);
+    public <K> void delete(K key) {
+        redisTemplate.delete(key);
     }
 
     /**

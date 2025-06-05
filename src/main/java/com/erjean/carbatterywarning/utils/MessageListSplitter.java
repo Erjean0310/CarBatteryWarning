@@ -1,4 +1,4 @@
-package com.erjean.carbatterywarning.mq;
+package com.erjean.carbatterywarning.utils;
 
 import org.apache.rocketmq.common.message.Message;
 
@@ -6,16 +6,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-// 消息列表分割器：其只会处理每条消息的大小不超4M的情况。
-// 若存在某条消息，其本身大小大于4M，这个分割器无法处理，
-// 其直接将这条消息构成一个子列表返回。并没有再进行分割
+
+/**
+ * 消息批量发送工具类
+ */
 public class MessageListSplitter implements Iterator<List<Message>> {
-    // 指定极限值为4M
-    private final int SIZE_LIMIT =  4 *1024 * 1024;
+    // 指定极限值为4M（默认大小）
+    private final int SIZE_LIMIT = 4 * 1024 * 1024;
     // 存放所有要发送的消息
     private final List<Message> messages;
     // 要进行批量发送消息的小集合起始索引
     private int currIndex;
+
     public MessageListSplitter(List<Message> messages) {
         this.messages = messages;
     }
@@ -57,7 +59,7 @@ public class MessageListSplitter implements Iterator<List<Message>> {
                 totalSize += tmpSize;
             }
 
-        } // end-for
+        }
 
         // 获取当前messages列表的子集合[currIndex, nextIndex)
         List<Message> subList = messages.subList(currIndex, nextIndex);

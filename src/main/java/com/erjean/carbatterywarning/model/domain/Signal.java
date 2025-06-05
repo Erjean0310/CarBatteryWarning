@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+/**
+ * 读取的信号数据
+ */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Signal {
@@ -19,26 +22,3 @@ public class Signal {
     @JsonProperty("Ii")
     private Float Ii;
 }
-//import com.fasterxml.jackson.annotation.JsonInclude;
-//import com.fasterxml.jackson.annotation.JsonProperty;
-//import lombok.Data;
-//
-///**
-// *
-// */
-//@Data
-//@JsonInclude(JsonInclude.Include.NON_NULL)
-//public class Signal {
-//    @JsonProperty("Mx")
-//    private Float maxVoltage;
-//
-//    @JsonProperty("Mi")
-//    private Float minVoltage;
-//
-//    @JsonProperty("Ix")
-//    private Float maxCurrent;
-//
-//    @JsonProperty("Ii")
-//    private Float minCurrent;
-//
-//}

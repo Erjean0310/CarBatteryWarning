@@ -16,4 +16,6 @@ public class WarnRule {
     private Integer batteryType;
 
     private Object rule;
+
+    private static final long serialVersionUID = 1L;
 }

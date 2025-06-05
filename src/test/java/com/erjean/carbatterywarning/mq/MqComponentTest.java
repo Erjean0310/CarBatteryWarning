@@ -1,5 +1,6 @@
 package com.erjean.carbatterywarning.mq;
 
+import com.erjean.carbatterywarning.utils.RocketMqUtils;
 import org.apache.rocketmq.common.message.Message;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,7 @@ import java.util.List;
 public class MqComponentTest {
 
     @Autowired
-    private MqComponent mqComponent;
+    private RocketMqUtils mqComponent;
 
     @Test
     void testBatchSendMessage() {

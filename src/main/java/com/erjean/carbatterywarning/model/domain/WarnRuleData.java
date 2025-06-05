@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 /**
- *
+ * 规则数据
  */
 @Data
 public class WarnRuleData {

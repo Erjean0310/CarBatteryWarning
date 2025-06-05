@@ -18,4 +18,7 @@ public class VehicleInfo {
     private Integer totalMileage;
 
     private Integer batteryHealth;
+
+    private static final long serialVersionUID = 1L;
+
 }

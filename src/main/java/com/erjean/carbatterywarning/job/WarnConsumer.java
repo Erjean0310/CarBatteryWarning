@@ -2,32 +2,30 @@ package com.erjean.carbatterywarning.job;
 
 import com.erjean.carbatterywarning.loader.WarnDataLoader;
 import com.erjean.carbatterywarning.mapper.BatterySignalMapper;
-import com.erjean.carbatterywarning.model.domain.*;
+import com.erjean.carbatterywarning.model.domain.Rule;
+import com.erjean.carbatterywarning.model.domain.Signal;
+import com.erjean.carbatterywarning.model.domain.WarnHandlerResult;
+import com.erjean.carbatterywarning.model.domain.WarnRuleData;
 import com.erjean.carbatterywarning.model.entity.BatterySignal;
 import com.erjean.carbatterywarning.model.enums.BatteryTypeEnum;
+import com.erjean.carbatterywarning.utils.RocketMqUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
-import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
-@Configuration
 @Slf4j
 public class WarnConsumer {
 
-    @Value("${rocketmq.name-server}")
-    private String nameServerAddr;
+    @Resource
+    private RocketMqUtils rocketMqUtils;
 
     @Resource
     private BatterySignalMapper batterySignalMapper;
@@ -40,18 +38,9 @@ public class WarnConsumer {
 
     @PostConstruct
     public void init() throws Exception {
-        DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("warn-cg");
-        consumer.setNamesrvAddr(nameServerAddr);
-        consumer.subscribe("warn-topic", "*");
-
-        // 设置并发参数
-        consumer.setConsumeThreadMin(10);  // 最小线程数
-        consumer.setConsumeThreadMax(30);  // 最大线程数
-        consumer.setPullBatchSize(64);     // 每次从 Broker 拉取最多 64 条消息
-        consumer.setConsumeMessageBatchMaxSize(64); // 每次提交处理的消息数量（单条处理）
-
-        consumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {
-            List<BatterySignal> batchList = new ArrayList<>();
+        rocketMqUtils.registerMessageListener((msgs, context) -> {
+            // 处理过的信号id
+            List<Long> ids = new ArrayList<>();
 
             for (MessageExt msg : msgs) {
                 try {
@@ -66,8 +55,9 @@ public class WarnConsumer {
                     Long carId = batterySignal.getCarId();
                     Integer batteryType = batterySignal.getBatteryType();
                     String signalStr = (String) batterySignal.getSignal();
-                    Signal signal = null;
+                    Date reportTime = batterySignal.getReportTime();
 
+                    Signal signal;
                     try {
                         signal = cleanObjectMapper.readValue(signalStr, Signal.class);
                     } catch (Exception e) {
@@ -75,8 +65,7 @@ public class WarnConsumer {
                         continue;
                     }
 
-                    Date reportTime = batterySignal.getReportTime();
-
+                    // 获取报警规则
                     Map<BatteryTypeEnum, Map<Integer, WarnRuleData>> warnRules = warnDataLoader.getWarnRules();
                     BatteryTypeEnum batteryTypeEnum = BatteryTypeEnum.fromValue(batteryType);
                     Map<Integer, WarnRuleData> warnRuleDataMap = warnRules.get(batteryTypeEnum);
@@ -107,9 +96,7 @@ public class WarnConsumer {
                         }
                     }
 
-                    // 缓存当前消息用于后续批量操作
-                    batchList.add(batterySignal);
-
+                    ids.add(id);
                 } catch (Exception e) {
                     log.error("消费消息失败", e);
                     return ConsumeConcurrentlyStatus.RECONSUME_LATER;
@@ -117,11 +104,7 @@ public class WarnConsumer {
             }
 
             // 批量更新数据库
-            if (!batchList.isEmpty()) {
-                List<Long> ids = batchList.stream()
-                        .map(BatterySignal::getId)
-                        .collect(Collectors.toList());
-
+            if (!ids.isEmpty()) {
                 try {
                     batterySignalMapper.batchUpdateProcessState(ids, new Date());
                     log.info("批量更新 {} 条记录", ids.size());
@@ -133,9 +116,6 @@ public class WarnConsumer {
 
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         });
-
-        consumer.start();
-        log.info("原生 RocketMQ 批量+并行消费者已启动");
     }
 
     public WarnHandlerResult judgeWarn(Float diff, WarnRuleData warnRuleData) {

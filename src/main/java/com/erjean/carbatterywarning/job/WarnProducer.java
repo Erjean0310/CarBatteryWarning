@@ -3,13 +3,11 @@ package com.erjean.carbatterywarning.job;
 import com.erjean.carbatterywarning.constant.RedisConstants;
 import com.erjean.carbatterywarning.mapper.BatterySignalMapper;
 import com.erjean.carbatterywarning.model.entity.BatterySignal;
+import com.erjean.carbatterywarning.utils.RocketMqUtils;
 import com.erjean.carbatterywarning.utils.RedisUtils;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.rocketmq.client.producer.SendResult;
-import com.erjean.carbatterywarning.mq.MqComponent;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.rocketmq.common.message.Message; // 确保导入 Message 类
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.common.message.Message;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -30,13 +28,10 @@ public class WarnProducer {
     private BatterySignalMapper batterySignalMapper;
 
     @Resource
-    private RocketMQTemplate rocketMQTemplate;
-
-    @Resource
     private RedisUtils redisUtils;
 
     @Resource
-    private MqComponent mqComponent;
+    private RocketMqUtils rocketMqUtils;
 
     @Resource
     private ObjectMapper cleanObjectMapper;
@@ -99,7 +94,7 @@ public class WarnProducer {
                                 .collect(Collectors.toList());
 
                         if (!messagesToSend.isEmpty()) {
-                            mqComponent.batchSendMessage("warn-topic", messagesToSend);
+                            rocketMqUtils.batchSendMessage("warn-topic", messagesToSend);
                             System.out.println("批量发送了 " + messagesToSend.size() + " 条数据到 warn-topic");
                         }
                     }

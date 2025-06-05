@@ -34,12 +34,22 @@ public class SignalController {
     }
 
 
+    /**
+     * 根据车辆vid查询车辆信号
+     * @param vid 车辆vid
+     * @return 车辆信号
+     */
     @GetMapping("/signal/{vid}")
     public BaseResponse<BatterySignal> listSignalsByVid(@PathVariable String vid) {
         BatterySignal batterySignal = signalService.getSignalByVid(vid);
         return ResultUtil.success(batterySignal);
     }
 
+    /**
+     * 告警接口
+     * @param requests 告警请求参数
+     * @return 告警结果
+     */
     @PostMapping("/warn")
     public BaseResponse<List<WarnResult>> warn(@RequestBody List<WarningReportRequest> requests) {
         List<WarnResult> results = signalService.warn(requests);
