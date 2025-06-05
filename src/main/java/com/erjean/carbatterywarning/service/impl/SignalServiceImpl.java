@@ -75,8 +75,8 @@ public class SignalServiceImpl implements SignalService {
         // 将信号 ID 添加到待处理队列
         redisUtils.listRightPush(RedisConstants.SIGNAL_PENDING_QUEUE_KEY, id);
 
-        // 将该信号数据作为该 vid 的最新信号存入 Redis String
-        redisUtils.set(RedisConstants.LATEST_SIGNAL_KEY + batterySignal.getVid(), batterySignal, 60 * 30); // 缓存半小时
+        // 删除缓存，保证数据一致性
+        redisUtils.delete(RedisConstants.LATEST_SIGNAL_KEY + batterySignal.getVid());
 
         // 返回 id
         return id;
@@ -90,7 +90,7 @@ public class SignalServiceImpl implements SignalService {
      */
     @Override
     public BatterySignal getSignalByVid(String vid) {
-        BatterySignal batterySignal = (BatterySignal) redisUtils.get(RedisConstants.LATEST_SIGNAL_KEY + vid);
+        BatterySignal batterySignal = redisUtils.get(RedisConstants.LATEST_SIGNAL_KEY + vid);
 
         if (batterySignal != null) {
             return batterySignal;
