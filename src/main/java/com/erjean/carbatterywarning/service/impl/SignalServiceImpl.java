@@ -67,12 +67,16 @@ public class SignalServiceImpl implements SignalService {
         } catch (JsonProcessingException e) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "无法解析信号数据");
         }
+
         // 保存到数据库
         int result = batterySignalMapper.insert(batterySignal);
         ThrowUtil.throwIf(result != 1, ErrorCode.OPERATION_ERROR, "保存信号的数据库出错");
 
-        // 缓存数据
-        redisUtils.hashPut(RedisConstants.BATTERY_SIGNAL_KEY + batterySignal.getVid(), String.valueOf(id), batterySignal);
+        // 将信号 ID 添加到待处理队列
+        redisUtils.listRightPush(RedisConstants.SIGNAL_PENDING_QUEUE_KEY, id);
+
+        // 将该信号数据作为该 vid 的最新信号存入 Redis String
+        redisUtils.set(RedisConstants.LATEST_SIGNAL_KEY + batterySignal.getVid(), batterySignal, 60 * 30); // 缓存半小时
 
         // 返回 id
         return id;
@@ -85,27 +89,21 @@ public class SignalServiceImpl implements SignalService {
      * @return 信号记录
      */
     @Override
-    public List<BatterySignal> listSignalsByVid(String vid) {
-        // 查询缓存
-        List<Object> batterSignalObjects = redisUtils.hashValues(RedisConstants.BATTERY_SIGNAL_KEY + vid);
-        List<BatterySignal> batterySignalList;
-        if (batterSignalObjects != null && !batterSignalObjects.isEmpty()) {
-            batterySignalList = new ArrayList<>();
-            for (Object batterSignalObject : batterSignalObjects) {
-                BatterySignal batterySignal = (BatterySignal) batterSignalObject;
-                batterySignalList.add(batterySignal);
-            }
-            return batterySignalList;
-        } else {
-            // 缓存未命中则查询数据库
-            batterySignalList = batterySignalMapper.selectByVid(vid);
+    public BatterySignal getSignalByVid(String vid) {
+        BatterySignal batterySignal = (BatterySignal) redisUtils.get(RedisConstants.LATEST_SIGNAL_KEY + vid);
 
-            // 添加到缓存
-            for (BatterySignal batterySignal : batterySignalList) {
-                redisUtils.hashPut(RedisConstants.BATTERY_SIGNAL_KEY + vid, batterySignal.getId(), batterySignal);
+        if (batterySignal != null) {
+            return batterySignal;
+        } else {
+            // 缓存未命中，从数据库查询最新信号
+            batterySignal = batterySignalMapper.selectLatestSignalByVid(vid);
+            if (batterySignal != null) {
+                // 将从数据库查询到的最新信号添加到 Redis 缓存
+                redisUtils.set(RedisConstants.LATEST_SIGNAL_KEY + vid, batterySignal, 60 * 60); // 缓存 1 小时
+                return batterySignal;
             }
         }
-        return batterySignalList;
+        return null;
     }
 
     @Override

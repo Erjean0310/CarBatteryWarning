@@ -22,13 +22,15 @@
         processed,processed_time
     </sql>
     <insert id="insert">
-        INSERT INTO battery_signal (vid,
+        INSERT INTO battery_signal (id,
+                                    vid,
                                     car_id,
                                     battery_type,
                                     `signal`,
                                     report_time,
                                     processed)
-        VALUES (#{vid},
+        VALUES (#{id},
+                #{vid},
                 #{carId},
                 #{batteryType},
                 #{signal},
@@ -72,5 +74,35 @@
           AND processed = 0
     </select>
 
+    <select id="selectLatestSignalByVid" resultMap="BaseResultMap">
+        SELECT id,
+               vid,
+               car_id,
+               battery_type,
+               `signal`,
+               report_time,
+               processed,
+               processed_time
+        FROM battery_signal
+        WHERE vid = #{vid}
+        ORDER BY report_time DESC LIMIT 1
+    </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+        SELECT
+        id,
+        vid,
+        car_id,
+        battery_type,
+        `signal`,
+        report_time,
+        processed,
+        processed_time
+        FROM battery_signal
+        WHERE id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 
 </mapper>

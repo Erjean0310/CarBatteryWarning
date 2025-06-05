@@ -9,6 +9,7 @@ import java.util.List;
 public interface BatterySignalMapper {
     /**
      * 插入电池信号到数据库
+     *
      * @param batterySignal 信号信息
      * @return 插入的行数
      */
@@ -20,6 +21,9 @@ public interface BatterySignalMapper {
 
     int updateProcessState(@Param("id") Long id, @Param("processedTime") Date processedTime);
 
+    BatterySignal selectLatestSignalByVid(String vid);
+
+    List<BatterySignal> selectByIds(@Param("ids") List<Long> ids);
 }
 
 

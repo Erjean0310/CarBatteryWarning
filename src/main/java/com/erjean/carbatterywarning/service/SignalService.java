@@ -19,7 +19,7 @@ public interface SignalService {
      */
     Long report(SignalReportRequest request);
 
-    List<BatterySignal> listSignalsByVid(String vid);
+    BatterySignal getSignalByVid(String vid);
 
     List<WarnResult> warn(List<WarningReportRequest> requests);
 }

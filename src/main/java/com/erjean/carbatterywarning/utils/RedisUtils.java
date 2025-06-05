@@ -157,7 +157,7 @@ public class RedisUtils {
      */
     public <K, V> void listLeftPush(K key, V value) {
         ListOperations<K, V> listOperations = redisTemplate.opsForList();
-        //从队列右插入
+        //从队列左插入
         listOperations.leftPush(key, value);
     }
 
@@ -264,6 +264,35 @@ public class RedisUtils {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * 获取列表的长度
+     *
+     * @param key 键
+     * @return 列表的长度
+     */
+    public <K> Long listSize(K key) {
+        try {
+            return redisTemplate.opsForList().size(key);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 裁剪列表，保留指定范围内的元素
+     * @param key 键
+     * @param start 开始索引
+     * @param end 结束索引
+     */
+    public <K> void listTrim(K key, long start, long end) {
+        try {
+            redisTemplate.opsForList().trim(key, start, end);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
