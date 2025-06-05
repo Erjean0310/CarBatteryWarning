@@ -5,6 +5,10 @@ import com.erjean.carbatterywarning.mapper.BatterySignalMapper;
 import com.erjean.carbatterywarning.model.entity.BatterySignal;
 import com.erjean.carbatterywarning.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.SendResult;
+import com.erjean.carbatterywarning.mq.MqComponent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.rocketmq.common.message.Message; // 确保导入 Message 类
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -30,6 +34,12 @@ public class WarnProducer {
 
     @Resource
     private RedisUtils redisUtils;
+
+    @Resource
+    private MqComponent mqComponent;
+
+    @Resource
+    private ObjectMapper cleanObjectMapper;
 
     private static final int BATCH_SIZE = 100;
     private static final int THREAD_COUNT = 4;
@@ -73,9 +83,24 @@ public class WarnProducer {
                 try {
                     List<BatterySignal> batterySignalList = batterySignalMapper.selectByIds(subList);
                     if (batterySignalList != null && !batterySignalList.isEmpty()) {
-                        for (BatterySignal signal : batterySignalList) {
-                            rocketMQTemplate.convertAndSend("warn-topic", signal);
-                            System.out.println("发送了数据: " + signal);
+                        // 将 BatterySignal 列表转换为 Message 列表
+                        List<Message> messagesToSend = batterySignalList.stream()
+                                .map(signal -> {
+                                    try {
+                                        // 使用 ObjectMapper 将 BatterySignal 对象序列化为 JSON 字符串作为消息体
+                                        byte[] body = cleanObjectMapper.writeValueAsBytes(signal);
+                                        return new Message("warn-topic", body);
+                                    } catch (Exception e) {
+                                        log.error("序列化 BatterySignal 失败", e);
+                                        return null;
+                                    }
+                                })
+                                .filter(java.util.Objects::nonNull)
+                                .collect(Collectors.toList());
+
+                        if (!messagesToSend.isEmpty()) {
+                            mqComponent.batchSendMessage("warn-topic", messagesToSend);
+                            System.out.println("批量发送了 " + messagesToSend.size() + " 条数据到 warn-topic");
                         }
                     }
                 } catch (Exception e) {
